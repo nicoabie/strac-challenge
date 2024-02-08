@@ -9,7 +9,6 @@ const express = require('express');
 const { renderFiles, renderWatchPage } = require('./render');
 const app = express();
 
-// Express route to trigger listing files
 app.get('/list-files', (req, res) => {
   authorize().then((authClient) => listFiles(authClient)).then((list) => res.send(renderFiles(list)));
 });
@@ -35,6 +34,8 @@ app.get('/watch-file/:fileId', (req, res) => {
       res.write(`data: ${JSON.stringify(users)}\n\n`);
     });
   }, SEND_INTERVAL);
+
+  req.on('close', () => clearInterval(watchFileInterval));
 });
 
 app.get('/watch/:fileId', (req, res) => {

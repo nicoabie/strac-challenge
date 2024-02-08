@@ -20,6 +20,8 @@ const renderWatchPage = (fileId) => `
 
         document.querySelector('#users').innerHTML = formatter.format(parsedData.map(u => u.displayName));
       };
+
+      window.addEventListener("beforeunload", () => events.close());
     </script>
 </html>
 `
