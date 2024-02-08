@@ -1,11 +1,12 @@
 const fs = require('fs').promises;
+const createWriteStream = require('fs').createWriteStream;
 const path = require('path');
 const process = require('process');
-const {authenticate} = require('@google-cloud/local-auth');
-const {google} = require('googleapis');
+const { authenticate } = require('@google-cloud/local-auth');
+const { google } = require('googleapis');
 
 // If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
+const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly', 'https://www.googleapis.com/auth/drive'];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
@@ -70,7 +71,7 @@ async function authorize() {
  * @param {OAuth2Client} authClient An authorized OAuth2 client.
  */
 async function listFiles(authClient) {
-  const drive = google.drive({version: 'v3', auth: authClient});
+  const drive = google.drive({ version: 'v3', auth: authClient });
   const res = await drive.files.list({
     pageSize: 10,
     fields: 'nextPageToken, files(id, name)',
@@ -87,4 +88,24 @@ async function listFiles(authClient) {
   });
 }
 
-authorize().then(listFiles).catch(console.error);
+/**
+ * Downloads fileId stream into filename
+ * @param {OAuth2Client} authClient An authorized OAuth2 client.
+ * @param {string} fileId origin.
+ * @param {string} filename destination.
+ */
+function downloadFile(authClient, fileId, filename) {
+  const drive = google.drive({ version: 'v3', auth: authClient });
+  const dest = createWriteStream(filename);
+  drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream' },
+    (err, res) => {
+      if (err) return console.error('The API returned an error:', err.message);
+      res.data
+        .on('error', err => console.error(err))
+        .on('end', () => console.log('Downloaded file.'))
+        .pipe(dest);
+    });
+}
+
+// authorize().then(listFiles).catch(console.error);
+authorize().then((authClient) => downloadFile(authClient, '1Dh50EV8d3R2WG2BRRl8Yr8QL189GZ9xS', 'test_download')).catch(console.error);
