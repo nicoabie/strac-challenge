@@ -107,5 +107,27 @@ function downloadFile(authClient, fileId, filename) {
     });
 }
 
-// authorize().then(listFiles).catch(console.error);
-authorize().then((authClient) => downloadFile(authClient, '1Dh50EV8d3R2WG2BRRl8Yr8QL189GZ9xS', 'test_download')).catch(console.error);
+/**
+ * Logs fileId users into the console
+ * @param {OAuth2Client} authClient An authorized OAuth2 client.
+ * @param {string} fileId origin.
+ */
+async function listFileUsers(authClient, fileId) {
+  const drive = google.drive({ version: 'v3', auth: authClient });
+  const res = await drive.permissions.list({
+    fileId: fileId,
+    fields: 'permissions(emailAddress,displayName)',
+  });
+  const users = res.data.permissions;
+  if (users.length) {
+    console.log('Users with access to the file:');
+    users.forEach((user) => {
+      console.log(`${user.displayName || user.emailAddress}`);
+    });
+  } else {
+    console.log('No users found with access to the file.');
+  }
+}
+
+authorize().then(listFiles).catch(console.error);
+// authorize().then((authClient) => downloadFile(authClient, '1Dh50EV8d3R2WG2BRRl8Yr8QL189GZ9xS', 'test_download')).catch(console.error);
