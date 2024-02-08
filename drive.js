@@ -1,5 +1,4 @@
 const { google } = require('googleapis');
-const createWriteStream = require('fs').createWriteStream;
 
 /**
  * Lists the names and IDs of up to 10 files.
@@ -15,22 +14,17 @@ async function listFiles(authClient) {
 }
 
 /**
- * Downloads fileId stream into filename
+ * Gets fileId stream
  * @param {OAuth2Client} authClient An authorized OAuth2 client.
  * @param {string} fileId origin.
- * @param {string} filename destination.
  */
-function downloadFile(authClient, fileId, filename) {
+async function getFile(authClient, fileId) {
   const drive = google.drive({ version: 'v3', auth: authClient });
-  const dest = createWriteStream(filename);
-  drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream' },
-    (err, res) => {
-      if (err) return console.error('The API returned an error:', err.message);
-      res.data
-        .on('error', err => console.error(err))
-        .on('end', () => console.log('Downloaded file.'))
-        .pipe(dest);
-    });
+  const res = await Promise.all([
+    drive.files.get({ fileId: fileId, fields: 'name' }),
+    drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream' })
+  ]);
+  return { name: res[0].data.name, stream: res[1].data };
 }
 
 /**
@@ -57,6 +51,6 @@ async function listFileUsers(authClient, fileId) {
 
 module.exports = {
   listFiles,
-  downloadFile,
+  getFile,
   listFileUsers
 }
