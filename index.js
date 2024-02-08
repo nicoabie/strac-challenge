@@ -6,11 +6,12 @@ const SEND_INTERVAL = 2000;
 let watchFileInterval;
 
 const express = require('express');
+const { renderFiles } = require('./render');
 const app = express();
 
 // Express route to trigger listing files
 app.get('/list-files', (req, res) => {
-  authorize().then((authClient) => listFiles(authClient)).then((list) => res.send(list));
+  authorize().then((authClient) => listFiles(authClient)).then((list) => res.send(renderFiles(list)));
 });
 
 app.get('/download-file/:fileId', (req, res) => {
