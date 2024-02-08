@@ -28,29 +28,21 @@ async function getFile(authClient, fileId) {
 }
 
 /**
- * Logs fileId users into the console
+ * Gets the users with access to the file
  * @param {OAuth2Client} authClient An authorized OAuth2 client.
  * @param {string} fileId origin.
  */
-async function listFileUsers(authClient, fileId) {
+async function getUsersWithFilePermission(authClient, fileId) {
   const drive = google.drive({ version: 'v3', auth: authClient });
   const res = await drive.permissions.list({
     fileId: fileId,
     fields: 'permissions(emailAddress,displayName)',
   });
-  const users = res.data.permissions;
-  if (users.length) {
-    console.log('Users with access to the file:');
-    users.forEach((user) => {
-      console.log(`${user.displayName || user.emailAddress}`);
-    });
-  } else {
-    console.log('No users found with access to the file.');
-  }
+  return res.data.permissions;
 }
 
 module.exports = {
   listFiles,
   getFile,
-  listFileUsers
+  getUsersWithFilePermission
 }

@@ -1,7 +1,9 @@
 const { authorize } = require('./auth');
-const { listFiles, getFile } = require('./drive')
+const { listFiles, getFile, getUsersWithFilePermission } = require('./drive')
 
 const PORT = 3000;
+const SEND_INTERVAL = 2000;
+let watchFileInterval;
 
 const express = require('express');
 const app = express();
@@ -15,9 +17,24 @@ app.get('/download-file/:fileId', (req, res) => {
   const fileId = req.params.fileId;
   authorize().then((authClient) => getFile(authClient, fileId)).then((file) => {
     res.setHeader('Content-disposition', 'attachment; filename=' + file.name);
-    console.dir(file, {depth:null})
     file.stream.pipe(res)
   });
+});
+
+
+app.get('/watch-file/:fileId', (req, res) => {
+  const fileId = req.params.fileId;
+  clearInterval(watchFileInterval);
+  res.writeHead(200, {
+    'Cache-Control': 'no-cache',
+    Connection: 'keep-alive',
+    'Content-Type': 'text/event-stream',
+  });
+  watchFileInterval = setInterval(() => {
+    authorize().then((authClient) => getUsersWithFilePermission(authClient, fileId)).then((users) => {
+      res.write(`data: ${JSON.stringify(users)}\n\n`);
+    });
+  }, SEND_INTERVAL);
 });
 
 // Start the server
