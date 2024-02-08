@@ -9,8 +9,9 @@ const express = require('express');
 const { renderFiles, renderWatchPage } = require('./render');
 const app = express();
 
-app.get('/list-files', (req, res) => {
-  authorize().then((authClient) => listFiles(authClient)).then((list) => res.send(renderFiles(list)));
+app.get('/list-files/:pageToken?', (req, res) => {
+  const pageToken = req.params.pageToken;
+  authorize().then((authClient) => listFiles(authClient, pageToken)).then((list) => res.send(renderFiles(list, pageToken)));
 });
 
 app.get('/download-file/:fileId', (req, res) => {

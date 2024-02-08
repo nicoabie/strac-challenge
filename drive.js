@@ -1,15 +1,20 @@
 const { google } = require('googleapis');
 
+const PAGE_SIZE = 20;
+
 /**
  * Lists the names and IDs of up to 10 files.
  * @param {OAuth2Client} authClient An authorized OAuth2 client.
+ * @param {string?} pageToken for pagination
  */
-async function listFiles(authClient) {
+async function listFiles(authClient, pageToken) {
   const drive = google.drive({ version: 'v3', auth: authClient });
   const res = await drive.files.list({
-    pageSize: 10,
+    pageSize: PAGE_SIZE,
     fields: 'nextPageToken, files(id, name)',
+    pageToken
   });
+  
   return res.data;
 }
 

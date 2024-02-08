@@ -1,4 +1,10 @@
-const renderFiles = (list) => `<ul style="list-style-type:none;">${list.files.map(f => `<li>${f.name} <a href="/download-file/${f.id}">download</a> <a href="/watch/${f.id}">watch</a></li>`).join('')}</ul>`;
+const renderFiles = (list, pageToken) => `
+  <ul style="list-style-type:none;">
+    ${list.files.map(f => `<li>${f.name} <a href="/download-file/${f.id}">download</a> <a href="/watch/${f.id}">watch</a></li>`).join('')}
+  </ul>
+  ${pageToken? `<a href="javascript:history.back()">go back</a>` : '' }
+  ${list.nextPageToken? `<a href="/list-files/${list.nextPageToken}">next page</a>` : '' }
+  `;
 
 const renderWatchPage = (fileId) => `
   <html>
