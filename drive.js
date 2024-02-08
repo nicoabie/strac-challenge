@@ -20,11 +20,15 @@ async function listFiles(authClient) {
  */
 async function getFile(authClient, fileId) {
   const drive = google.drive({ version: 'v3', auth: authClient });
-  const res = await Promise.all([
-    drive.files.get({ fileId: fileId, fields: 'name' }),
-    drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream' })
-  ]);
-  return { name: res[0].data.name, stream: res[1].data };
+  const metadata = await drive.files.get({ fileId: fileId, fields: 'name, fileExtension' });
+
+  if (metadata.data.fileExtension) {
+    const res = await drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream' })
+    return { name: metadata.data.name, stream: res.data };
+  } else {
+    const res = await drive.files.export({ fileId, mimeType: 'application/pdf' }, { responseType: 'stream' })
+    return { name: `${metadata.data.name}.pdf`, stream: res.data };
+  }
 }
 
 /**
