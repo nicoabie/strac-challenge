@@ -32,4 +32,4 @@ const renderWatchPage = (fileId) => `
 </html>
 `
 
-module.exports = { renderFiles, renderWatchPage };
+export { renderFiles, renderWatchPage };

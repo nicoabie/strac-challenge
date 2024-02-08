@@ -1,11 +1,10 @@
-const { authorize } = require('./auth');
-const { listFiles, getFile, getUsersWithFilePermission } = require('./drive')
+import { authorize } from './auth.js';
+import { listFiles, getFile, getUsersWithFilePermission } from './drive.js';
+import express from 'express';
+import { renderFiles, renderWatchPage } from './render.js';
 
 const PORT = 3000;
 const SEND_INTERVAL = 2000;
-
-const express = require('express');
-const { renderFiles, renderWatchPage } = require('./render');
 const app = express();
 
 app.get('/list-files/:pageToken?', (req, res) => {
@@ -44,5 +43,5 @@ app.get('/watch/:fileId', (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}/list-files`);
 });

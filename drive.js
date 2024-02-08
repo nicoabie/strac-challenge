@@ -1,4 +1,4 @@
-const { google } = require('googleapis');
+import { google } from 'googleapis';
 
 const PAGE_SIZE = 20;
 
@@ -14,7 +14,7 @@ async function listFiles(authClient, pageToken) {
     fields: 'nextPageToken, files(id, name)',
     pageToken
   });
-  
+
   return res.data;
 }
 
@@ -50,7 +50,7 @@ async function getUsersWithFilePermission(authClient, fileId) {
   return res.data.permissions;
 }
 
-module.exports = {
+export {
   listFiles,
   getFile,
   getUsersWithFilePermission
