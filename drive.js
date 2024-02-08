@@ -11,16 +11,7 @@ async function listFiles(authClient) {
     pageSize: 10,
     fields: 'nextPageToken, files(id, name)',
   });
-  const files = res.data.files;
-  if (files.length === 0) {
-    console.log('No files found.');
-    return;
-  }
-
-  console.log('Files:');
-  files.map((file) => {
-    console.log(`${file.name} (${file.id})`);
-  });
+  return res.data;
 }
 
 /**
