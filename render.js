@@ -11,7 +11,7 @@ const renderWatchPage = (fileId) => `
     <body>
       <a href="/list-files">go back</a>
       <h2>who has access?</h2> 
-      <div id="users"></div>
+      <div id="users">loading...</div>
     </body>
     <script>
       const events = new EventSource('/watch-file/${fileId}');
