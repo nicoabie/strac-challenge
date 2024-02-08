@@ -6,7 +6,7 @@ const SEND_INTERVAL = 2000;
 let watchFileInterval;
 
 const express = require('express');
-const { renderFiles } = require('./render');
+const { renderFiles, renderWatchPage } = require('./render');
 const app = express();
 
 // Express route to trigger listing files
@@ -36,6 +36,11 @@ app.get('/watch-file/:fileId', (req, res) => {
       res.write(`data: ${JSON.stringify(users)}\n\n`);
     });
   }, SEND_INTERVAL);
+});
+
+app.get('/watch/:fileId', (req, res) => {
+  const fileId = req.params.fileId;
+  res.send(renderWatchPage(fileId));
 });
 
 // Start the server
